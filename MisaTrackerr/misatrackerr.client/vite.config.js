@@ -62,6 +62,7 @@ const target = env.ASPNETCORE_HTTPS_PORT
         : 'https://localhost:7208';
 
 export default defineConfig({
+    base: '/',
     plugins: [
         react(),
 
