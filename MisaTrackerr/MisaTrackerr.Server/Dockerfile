@@ -4,12 +4,13 @@ WORKDIR /src
 
 COPY . .
 
-RUN dotnet restore "MisaTrackerr/MisaTrackerr.Server/MisaTrackerr.Server.csproj"
+RUN dotnet restore "MisaTrackerr/MisaTrackerr.Server/MisaTrackerr.Server.csproj" -p:SkipClientProject=true
 
 RUN dotnet publish "MisaTrackerr/MisaTrackerr.Server/MisaTrackerr.Server.csproj" \
     -c Release \
     -o /app/publish \
-    --no-restore
+    --no-restore \
+    -p:SkipClientProject=true
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app

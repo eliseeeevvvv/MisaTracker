@@ -27,9 +27,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\MisaTracker.Core\MisaTracker.Core.csproj" />
-    <ProjectReference Include="..\misatrackerr.client\misatrackerr.client.esproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
+	  <ProjectReference Include="..\misatrackerr.client\misatrackerr.client.esproj"
+					Condition="'$(SkipClientProject)' != 'true'">
+		  <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+	  </ProjectReference>
   </ItemGroup>
 
 </Project>
