@@ -5,11 +5,13 @@ import TaskManager from "./components/TaskManager";
 import { enablePushNotifications } from "./pushNotifications";
 import "./App.css";
 
+const API_BASE = "https://misatracker-api.onrender.com";
+
 const API = {
-    subjects: "/api/subjects",
-    tasks: "/api/tasks",
-    lessons: "/api/lessons",
-    auth: "/api/auth"
+    subjects: `${API_BASE}/api/subjects`,
+    tasks: `${API_BASE}/api/tasks`,
+    lessons: `${API_BASE}/api/lessons`,
+    auth: `${API_BASE}/api/auth`
 };
 
 export default function App() {
