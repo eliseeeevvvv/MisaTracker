@@ -216,7 +216,22 @@ export default function App() {
                 }
             );
 
-            const data = await response.json().catch(() => ({}));
+            const responseText = await response.text();
+
+            console.log("AUTH URL:", `${API.auth}/${isRegister ? "register" : "login"}`);
+            console.log("AUTH STATUS:", response.status);
+            console.log("AUTH RAW RESPONSE:", responseText);
+
+            let data = {};
+
+            try {
+                data = responseText ? JSON.parse(responseText) : {};
+            } catch {
+                throw new Error(
+                    `Сервер вернул не JSON. HTTP ${response.status}. Ответ: ${responseText.slice(0, 300) || "(пустой ответ)"
+                    }`
+                );
+            }
 
             if (!response.ok) {
                 throw new Error(

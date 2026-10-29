@@ -19,7 +19,16 @@ namespace MisaTrackerr.Server
 
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Frontend", policy =>
+                {
+                    policy
+                        .WithOrigins("https://misatracker-1.onrender.com")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
             // SQL Server
             var connectionString =
                 builder.Configuration.GetConnectionString("DefaultConnection");
@@ -129,12 +138,11 @@ namespace MisaTrackerr.Server
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("Frontend");
 
-            // Аутентификация и авторизация
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // Ограничение запросов на все endpoint'ы
             app.UseRateLimiter();
 
             app.MapControllers();
