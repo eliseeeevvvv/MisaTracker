@@ -1,5 +1,5 @@
 
-const API_URL = "/api/push";
+const API_URL = "https://misatracker-api.onrender.com/api/push";
 const TIMEOUT_MS = 10000;
 
 function getToken() {

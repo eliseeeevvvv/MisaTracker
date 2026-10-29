@@ -2,10 +2,12 @@
 import { useCallback, useEffect, useState } from "react";
 import "./TaskManager.css";
 
+const API_BASE = "https://misatracker-api.onrender.com";
+
 const API = {
-    tasks: "/api/tasks",
-    subjects: "/api/subjects",
-    folders: "/api/folders"
+    tasks: `${API_BASE}/api/tasks`,
+    subjects: `${API_BASE}/api/subjects`,
+    folders: `${API_BASE}/api/folders`
 };
 
 function authHeaders() {
