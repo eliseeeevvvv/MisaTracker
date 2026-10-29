@@ -18,7 +18,7 @@ function authHeaders() {
 }
 
 async function apiRequest(url, options = {}) {
-    console.log("API REQUEST:", url);
+    
     const response = await fetch(url, {
         ...options,
         headers: {

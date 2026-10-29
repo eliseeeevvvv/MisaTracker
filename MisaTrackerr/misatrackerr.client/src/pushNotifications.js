@@ -169,7 +169,7 @@ export async function enablePushNotifications() {
         });
     } catch (error) {
         throw new Error(
-            `Не удалось сохранить подписку на сервере. ${error.message}`, { cause: error }
+            `Не удалось сохранить подписку на сервере. ${error.message}`,{ cause: error }
         );
     }
 
@@ -229,20 +229,27 @@ export async function disablePushNotifications() {
 }
 
 function urlBase64ToUint8Array(base64String) {
-    const padding = "=".repeat(
-        (4 - (base64String.length % 4)) % 4
-    );
+    if (typeof base64String !== "string" || !base64String.trim()) {
+        throw new Error("Публичный VAPID-ключ пустой или отсутствует.");
+    }
 
-    const base64 = (base64String + padding)
+    const normalized = base64String
+        .trim()
         .replace(/-/g, "+")
         .replace(/_/g, "/");
 
-    const rawData = window.atob(base64);
-    const output = new Uint8Array(rawData.length);
+    const padding = "=".repeat((4 - normalized.length % 4) % 4);
+    const rawData = atob(normalized + padding);
 
-    for (let i = 0; i < rawData.length; i++) {
-        output[i] = rawData.charCodeAt(i);
+    const result = Uint8Array.from(
+        Array.from(rawData, char => char.charCodeAt(0))
+    );
+
+    if (result.length !== 65 || result[0] !== 4) {
+        throw new Error(
+            `Некорректный публичный VAPID-ключ: получено ${result.length} байт вместо 65.`
+        );
     }
 
-    return output;
+    return result;
 }
