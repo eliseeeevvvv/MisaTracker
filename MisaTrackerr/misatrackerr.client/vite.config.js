@@ -1,37 +1,34 @@
 
 import { fileURLToPath, URL } from 'node:url';
-
 import { defineConfig } from 'vite';
-import plugin from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-import fs from 'fs';
-import path from 'path';
-import child_process from 'child_process';
-import { env } from 'process';
+import fs from 'node:fs';
+import path from 'node:path';
+import child_process from 'node:child_process';
+import { env } from 'node:process';
+
+const isDevelopment = env.NODE_ENV !== 'production';
 
 const baseFolder =
-    env.APPDATA !== undefined && env.APPDATA !== ''
-        ? `${env.APPDATA}/ASP.NET/https`
-        : `${env.HOME}/.aspnet/https`;
+    env.APPDATA
+        ? path.join(env.APPDATA, 'ASP.NET', 'https')
+        : path.join(env.HOME || '', '.aspnet', 'https');
 
 const certificateName = 'misatrackerr.client';
-const certFilePath = path.join(
-    baseFolder,
-    `${certificateName}.pem`
-);
-const keyFilePath = path.join(
-    baseFolder,
-    `${certificateName}.key`
-);
+const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
+const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 
-if (!fs.existsSync(baseFolder)) {
-    fs.mkdirSync(baseFolder, { recursive: true });
-}
+let httpsConfig = undefined;
 
-if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
-    if (
-        child_process.spawnSync(
+if (isDevelopment) {
+    if (!fs.existsSync(baseFolder)) {
+        fs.mkdirSync(baseFolder, { recursive: true });
+    }
+
+    if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
+        const result = child_process.spawnSync(
             'dotnet',
             [
                 'dev-certs',
@@ -43,10 +40,19 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
                 '--no-password',
             ],
             { stdio: 'inherit' }
-        ).status !== 0
-    ) {
-        throw new Error('Could not create certificate.');
+        );
+
+        if (result.status !== 0) {
+            throw new Error(
+                'Не удалось создать HTTPS-сертификат для локальной разработки.'
+            );
+        }
     }
+
+    httpsConfig = {
+        key: fs.readFileSync(keyFilePath),
+        cert: fs.readFileSync(certFilePath),
+    };
 }
 
 const target = env.ASPNETCORE_HTTPS_PORT
@@ -57,17 +63,19 @@ const target = env.ASPNETCORE_HTTPS_PORT
 
 export default defineConfig({
     plugins: [
-        plugin(),
+        react(),
 
         VitePWA({
             strategies: 'injectManifest',
             srcDir: 'src',
             filename: 'sw.js',
             registerType: 'autoUpdate',
+
             devOptions: {
                 enabled: true,
                 type: 'module',
             },
+
             manifest: {
                 id: '/',
                 name: 'MisaTracker',
@@ -102,6 +110,11 @@ export default defineConfig({
     },
 
     server: {
+        host: '0.0.0.0',
+        port: parseInt(env.DEV_SERVER_PORT || '64106', 10),
+
+        ...(httpsConfig ? { https: httpsConfig } : {}),
+
         proxy: {
             '/api': {
                 target,
@@ -112,13 +125,6 @@ export default defineConfig({
                 target,
                 secure: false,
             },
-        },
-
-        port: parseInt(env.DEV_SERVER_PORT || '64106'),
-
-        https: {
-            key: fs.readFileSync(keyFilePath),
-            cert: fs.readFileSync(certFilePath),
         },
     },
 });
