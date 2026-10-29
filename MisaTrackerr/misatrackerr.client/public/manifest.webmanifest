@@ -1,0 +1,24 @@
+{
+  "id": "/",
+  "name": "MisaTracker",
+  "short_name": "MisaTracker",
+  "description": "Трекер учёбы, заданий и дедлайнов",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFDF7",
+  "theme_color": "#E7EEDC",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,478 @@
+
+/* MisaTracker — Matcha & Strawberry 🍓 */
+
+.task-manager {
+    --green: #526b4a;
+    --green-dark: #435b3d;
+    --green-light: #e7eedc;
+    --pink: #f8e3e9;
+    --pink-dark: #8e586c;
+    --cream: #fffdf7;
+    --text: #43513e;
+    --muted: #8c9384;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 34px 30px 56px;
+    color: var(--text);
+    font-family: "Nunito", "Segoe UI", sans-serif;
+}
+
+    .task-manager *,
+    .task-manager *::before,
+    .task-manager *::after {
+        box-sizing: border-box;
+    }
+
+    /* Header */
+
+    .task-manager .task-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 30px;
+    }
+
+    .task-manager .task-eyebrow {
+        margin: 0 0 8px;
+        color: #8b9b7e;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 2px;
+    }
+
+    .task-manager .task-header h2 {
+        margin: 0;
+        color: var(--green-dark);
+        font-size: clamp(27px, 3vw, 36px);
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    .task-manager .task-subtitle {
+        margin: 9px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    /* Unfinished counter */
+
+    .task-manager .task-counter {
+        display: flex;
+        min-width: 105px;
+        min-height: 105px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dfe8d6;
+        border-radius: 30px;
+        background: var(--green-light);
+    }
+
+        .task-manager .task-counter strong {
+            color: var(--green-dark);
+            font-size: 34px;
+            line-height: 1.2;
+            font-weight: 800;
+        }
+
+        .task-manager .task-counter span {
+            margin-top: 4px;
+            color: #718168;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+    /* Form */
+
+    .task-manager .task-form {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 19px;
+        margin-bottom: 36px;
+        padding: 28px;
+        border: 1px solid #e9ede3;
+        border-radius: 25px;
+        background: #fff;
+        box-shadow: 0 8px 28px rgba(67, 91, 61, 0.05);
+    }
+
+        .task-manager .task-form h3 {
+            grid-column: 1 / -1;
+            margin: 0;
+            color: var(--green-dark);
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .task-manager .task-form label {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 8px;
+            color: #5b6b52;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .task-manager .task-form input,
+        .task-manager .task-form textarea,
+        .task-manager .task-form select {
+            width: 100%;
+            min-width: 0;
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid #e2e8da;
+            border-radius: 13px;
+            outline: none;
+            background: var(--cream);
+            color: var(--green-dark);
+            font: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .task-manager .task-form textarea {
+            min-height: 105px;
+            resize: vertical;
+        }
+
+            .task-manager .task-form input::placeholder,
+            .task-manager .task-form textarea::placeholder {
+                color: #a2aa99;
+                font-weight: 400;
+            }
+
+            .task-manager .task-form input:focus,
+            .task-manager .task-form textarea:focus,
+            .task-manager .task-form select:focus {
+                border-color: #9caf8d;
+                box-shadow: 0 0 0 4px rgba(156, 175, 141, 0.15);
+            }
+
+    .task-manager .task-hint {
+        align-self: start;
+        margin: 0;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #f7ebd5;
+        color: #806b49;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .task-manager .task-add-button {
+        grid-column: 1 / -1;
+        justify-self: start;
+        min-height: 48px;
+        padding: 13px 22px;
+        border: 0;
+        border-radius: 14px;
+        background: var(--green);
+        color: white;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+        .task-manager .task-add-button:hover {
+            transform: translateY(-1px);
+            background: var(--green-dark);
+        }
+
+    .task-manager button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    /* Messages */
+
+    .task-manager .task-error,
+    .task-manager .task-success {
+        margin: 0 0 20px;
+        padding: 14px 17px;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .task-manager .task-error {
+        border: 1px solid #f0d0da;
+        background: var(--pink);
+        color: var(--pink-dark);
+    }
+
+    .task-manager .task-success {
+        border: 1px solid #dce8d2;
+        background: var(--green-light);
+        color: var(--green-dark);
+    }
+
+    /* List header */
+
+    .task-manager .task-list-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+        .task-manager .task-list-header h3 {
+            margin: 0;
+            color: var(--green-dark);
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .task-manager .task-list-header button {
+            padding: 10px 15px;
+            border: 1px solid #e1e8d9;
+            border-radius: 12px;
+            background: white;
+            color: var(--green);
+            font: inherit;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+            .task-manager .task-list-header button:hover {
+                background: var(--green-light);
+            }
+
+    /* Task grid */
+
+    .task-manager .task-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .task-manager .task-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        min-width: 0;
+        padding: 21px;
+        border: 1px solid #e9ede3;
+        border-radius: 21px;
+        background: white;
+        box-shadow: 0 5px 18px rgba(67, 91, 61, 0.04);
+        transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+
+        .task-manager .task-card:hover {
+            transform: translateY(-2px);
+            border-color: #d6e2cc;
+            box-shadow: 0 9px 24px rgba(67, 91, 61, 0.07);
+        }
+
+    /* Custom completion button */
+
+    .task-manager .task-check {
+        display: flex;
+        flex: 0 0 25px;
+        width: 25px;
+        height: 25px;
+        min-height: 25px;
+        align-items: center;
+        justify-content: center;
+        margin-top: 2px;
+        padding: 0;
+        border: 2px solid #c9d5bf;
+        border-radius: 9px;
+        background: white;
+        color: white;
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+        .task-manager .task-check:hover {
+            border-color: var(--green);
+            background: #f4f7ef;
+        }
+
+        .task-manager .task-check.checked {
+            border-color: var(--green);
+            background: var(--green);
+            color: white;
+        }
+
+    /* Task text */
+
+    .task-manager .task-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+        .task-manager .task-content h4 {
+            margin: 0 0 8px;
+            color: var(--green-dark);
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+        }
+
+        .task-manager .task-content p {
+            margin: 0 0 12px;
+            color: #818879;
+            font-size: 13px;
+            line-height: 1.65;
+            overflow-wrap: anywhere;
+        }
+
+    .task-manager .task-due {
+        display: block;
+        margin-top: 12px;
+        color: #788b6b;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .task-manager .task-meta {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 5px 9px;
+        border-radius: 9px;
+        background: #f0f3e9;
+        color: #6f7e64;
+        font-size: 11px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    /* Delete button */
+
+    .task-manager .task-delete {
+        display: flex;
+        flex: 0 0 32px;
+        width: 32px;
+        height: 32px;
+        min-height: 32px;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 0;
+        border-radius: 11px;
+        background: #fff0f3;
+        color: #b56f83;
+        font-size: 23px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+        .task-manager .task-delete:hover {
+            background: var(--pink);
+            color: var(--pink-dark);
+        }
+
+    /* Completed task */
+
+    .task-manager .task-card.completed {
+        background: #fafbf7;
+    }
+
+        .task-manager .task-card.completed .task-content h4 {
+            color: #929b8b;
+            text-decoration: line-through;
+        }
+
+    /* Empty state */
+
+    .task-manager .task-empty {
+        display: flex;
+        grid-column: 1 / -1;
+        min-height: 190px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        border: 1px dashed #d5dfcb;
+        border-radius: 22px;
+        background: #fbfcf7;
+        text-align: center;
+    }
+
+        .task-manager .task-empty span {
+            font-size: 32px;
+        }
+
+        .task-manager .task-empty p {
+            margin: 12px 0 0;
+            color: #84917b;
+            font-size: 14px;
+        }
+
+/* Responsive */
+
+@media (max-width: 760px) {
+    .task-manager {
+        padding: 24px 16px 40px;
+    }
+
+        .task-manager .task-header {
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .task-manager .task-counter {
+            min-width: 78px;
+            min-height: 78px;
+            border-radius: 23px;
+        }
+
+            .task-manager .task-counter strong {
+                font-size: 26px;
+            }
+
+            .task-manager .task-counter span {
+                font-size: 10px;
+            }
+
+        .task-manager .task-form {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 16px;
+            padding: 20px;
+            border-radius: 20px;
+        }
+
+            .task-manager .task-form h3,
+            .task-manager .task-form textarea,
+            .task-manager .task-add-button {
+                grid-column: 1;
+            }
+
+        .task-manager .task-add-button {
+            width: 100%;
+        }
+
+        .task-manager .task-list {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .task-manager .task-card {
+            padding: 17px;
+            border-radius: 18px;
+        }
+}
+
+@media (max-width: 400px) {
+    .task-manager .task-header h2 {
+        font-size: 25px;
+    }
+
+    .task-manager .task-card {
+        gap: 10px;
+        padding: 14px;
+    }
+
+    .task-manager .task-meta {
+        font-size: 10px;
+    }
+}

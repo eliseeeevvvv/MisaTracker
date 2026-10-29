@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="MisaTracker.Core/MisaTracker.Core.csproj" />
+  <Project Path="MisaTrackerr/misatrackerr.client/misatrackerr.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="MisaTrackerr/MisaTrackerr.Server/MisaTrackerr.Server.csproj" Id="d5fd6ad3-291b-4a16-9739-48d4b5d9ca54" />
+</Solution>

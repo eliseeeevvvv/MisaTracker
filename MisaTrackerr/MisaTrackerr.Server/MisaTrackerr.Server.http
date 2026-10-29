@@ -1,0 +1,6 @@
+@MisaTrackerr.Server_HostAddress = http://localhost:5133
+
+GET {{MisaTrackerr.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
