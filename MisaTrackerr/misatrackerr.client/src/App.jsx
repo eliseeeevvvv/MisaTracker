@@ -46,6 +46,9 @@ export default function App() {
     const [lessonDescription, setLessonDescription] = useState("");
     const [lessonStart, setLessonStart] = useState("");
     const [lessonEnd, setLessonEnd] = useState("");
+    const [lessonRecurring, setLessonRecurring] = useState(false);
+    const [lessonRepeatUntil, setLessonRepeatUntil] = useState("");
+
 
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
@@ -371,8 +374,20 @@ export default function App() {
             return;
         }
 
-        if (new Date(lessonEnd) <= new Date(lessonStart)) {
+        // datetime-local уже содержит локальное время пользователя.
+        // Не используем toISOString(): он переводит время в UTC.
+        if (lessonEnd <= lessonStart) {
             setError("Окончание должно быть позже начала.");
+            return;
+        }
+
+        if (lessonRecurring && !lessonRepeatUntil) {
+            setError("Укажи дату, до которой повторять урок.");
+            return;
+        }
+
+        if (lessonRecurring && lessonRepeatUntil < lessonStart.slice(0, 10)) {
+            setError("Дата окончания повтора не может быть раньше первого урока.");
             return;
         }
 
@@ -382,8 +397,13 @@ export default function App() {
                 body: JSON.stringify({
                     name: lessonName.trim(),
                     description: lessonDescription.trim(),
-                    startDate: new Date(lessonStart).toISOString(),
-                    endDate: new Date(lessonEnd).toISOString()
+                    // Передаём локальные дату и время без UTC-сдвига.
+                    startDate: `${lessonStart}:00`,
+                    endDate: `${lessonEnd}:00`,
+                    isRecurring: lessonRecurring,
+                    recurrenceEndDate: lessonRecurring
+                        ? `${lessonRepeatUntil}T23:59:59`
+                        : null
                 })
             });
 
@@ -391,7 +411,11 @@ export default function App() {
             setLessonDescription("");
             setLessonStart("");
             setLessonEnd("");
-            setMessage("Урок добавлен в расписание! 📅");
+            setLessonRecurring(false);
+            setLessonRepeatUntil("");
+            setMessage(lessonRecurring
+                ? "Регулярные уроки добавлены в расписание! 📅"
+                : "Урок добавлен в расписание! 📅");
 
             await loadData();
         } catch (err) {
@@ -838,6 +862,28 @@ export default function App() {
                             />
                         </label>
 
+                        <label className="lesson-recurring-toggle">
+                            <input
+                                type="checkbox"
+                                checked={lessonRecurring}
+                                onChange={e => setLessonRecurring(e.target.checked)}
+                            />
+                            <span>Сделать регулярным (каждую неделю)</span>
+                        </label>
+
+                        {lessonRecurring && (
+                            <label>
+                                Повторять до
+                                <input
+                                    type="date"
+                                    min={lessonStart ? lessonStart.slice(0, 10) : undefined}
+                                    value={lessonRepeatUntil}
+                                    onChange={e => setLessonRepeatUntil(e.target.value)}
+                                    required
+                                />
+                            </label>
+                        )}
+
                         <button type="submit">
                             + Добавить урок
                         </button>
@@ -858,6 +904,12 @@ export default function App() {
 
                                     {lesson.description && (
                                         <p>{lesson.description}</p>
+                                    )}
+
+                                    {lesson.isRecurring && (
+                                        <p className="lesson-recurring-badge">
+                                            ↻ Повторяется каждую неделю
+                                        </p>
                                     )}
 
                                     <p>

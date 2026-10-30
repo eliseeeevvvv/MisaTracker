@@ -468,3 +468,29 @@
     .deadline-notice small {
         color: #756b67;
     }
+
+
+/* Регулярные уроки */
+.lesson-recurring-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    cursor: pointer;
+}
+
+    .lesson-recurring-toggle input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #526b4a;
+    }
+
+.lesson-recurring-badge {
+    display: inline-block;
+    margin: 4px 0 10px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #e7eedc;
+    color: #435b3d;
+    font-size: 0.9rem;
+}

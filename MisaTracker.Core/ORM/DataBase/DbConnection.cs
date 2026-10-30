@@ -53,6 +53,9 @@ namespace MisaTracker.Core.ORM.DataBase
                 .HasForeignKey(t => t.SubjectId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Lesson>()
+                .HasIndex(l => l.RecurrenceGroupId);
+
             modelBuilder.Entity<PushSubscription>()
                 .HasOne(p => p.User)
                 .WithMany()

@@ -51,7 +51,9 @@ namespace MisaTrackerr.Server.Controllers
                     l.Name,
                     l.Description,
                     l.StartDate,
-                    l.EndDate
+                    l.EndDate,
+                    l.IsRecurring,
+                    l.RecurrenceGroupId
                 })
                 .ToListAsync();
 
@@ -79,7 +81,9 @@ namespace MisaTrackerr.Server.Controllers
                     l.Name,
                     l.Description,
                     l.StartDate,
-                    l.EndDate
+                    l.EndDate,
+                    l.IsRecurring,
+                    l.RecurrenceGroupId
                 })
                 .FirstOrDefaultAsync();
 
@@ -107,29 +111,50 @@ namespace MisaTrackerr.Server.Controllers
             await using var db =
                 await _contextFactory.CreateDbContextAsync();
 
-            var lesson = new Lesson
-            {
-                Name = request.Name.Trim(),
-                Description = request.Description?.Trim() ?? "",
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
-                UserId = userId.Value
-            };
+            var groupId = request.IsRecurring ? Guid.NewGuid() : (Guid?)null;
+            var lessonsToCreate = new List<Lesson>();
 
-            db.Lessons.Add(lesson);
+            // Даты хранятся как локальное время без UTC-конвертации.
+            // Поэтому 14:00 из datetime-local останется 14:00 в базе и интерфейсе.
+            var start = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Unspecified);
+            var end = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Unspecified);
+
+            var repeatUntil = request.RecurrenceEndDate.HasValue
+                ? DateTime.SpecifyKind(request.RecurrenceEndDate.Value, DateTimeKind.Unspecified).Date
+                : start.Date;
+
+            for (var occurrenceStart = start;
+                 occurrenceStart.Date <= repeatUntil;
+                 occurrenceStart = occurrenceStart.AddDays(7))
+            {
+                var occurrenceEnd = end.AddDays((occurrenceStart - start).Days);
+
+                lessonsToCreate.Add(new Lesson
+                {
+                    Name = request.Name.Trim(),
+                    Description = request.Description?.Trim() ?? "",
+                    StartDate = occurrenceStart,
+                    EndDate = occurrenceEnd,
+                    UserId = userId.Value,
+                    IsRecurring = request.IsRecurring,
+                    RecurrenceGroupId = groupId,
+                    RecurrenceEndDate = request.IsRecurring ? repeatUntil : null
+                });
+            }
+
+            db.Lessons.AddRange(lessonsToCreate);
             await db.SaveChangesAsync();
 
-            return CreatedAtAction(
-                nameof(GetLesson),
-                new { id = lesson.Id },
-                new
-                {
-                    lesson.Id,
-                    lesson.Name,
-                    lesson.Description,
-                    lesson.StartDate,
-                    lesson.EndDate
-                });
+            return Ok(lessonsToCreate.Select(lesson => new
+            {
+                lesson.Id,
+                lesson.Name,
+                lesson.Description,
+                lesson.StartDate,
+                lesson.EndDate,
+                lesson.IsRecurring,
+                lesson.RecurrenceGroupId
+            }));
         }
 
         // PUT: api/lessons/5
@@ -209,6 +234,18 @@ namespace MisaTrackerr.Server.Controllers
             if (request.EndDate <= request.StartDate)
                 return "Время окончания должно быть позже начала.";
 
+            if (request.IsRecurring)
+            {
+                if (!request.RecurrenceEndDate.HasValue)
+                    return "Укажи дату окончания повторения.";
+
+                if (request.RecurrenceEndDate.Value.Date < request.StartDate.Date)
+                    return "Дата окончания повторения не может быть раньше первого урока.";
+
+                if ((request.RecurrenceEndDate.Value.Date - request.StartDate.Date).TotalDays > 364)
+                    return "Можно создавать регулярные уроки максимум на год вперёд.";
+            }
+
             return null;
         }
     }
@@ -225,5 +262,9 @@ namespace MisaTrackerr.Server.Controllers
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
+
+        public bool IsRecurring { get; set; }
+
+        public DateTime? RecurrenceEndDate { get; set; }
     }
 }
